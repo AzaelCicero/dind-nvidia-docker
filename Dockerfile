@@ -1,4 +1,4 @@
-ARG CUDA_IMAGE=nvidia/cuda:9.0-runtime
+ARG CUDA_IMAGE=nvidia/cuda:10.2-runtime
 FROM ${CUDA_IMAGE}
 
 ARG DOCKER_CE_VERSION=5:18.09.1~3-0~ubuntu-xenial
@@ -16,12 +16,14 @@ RUN apt-get update -q && \
        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
        $(lsb_release -cs) \
        stable"  && \
-    apt-get update -q && apt-get install -yq docker-ce=${DOCKER_CE_VERSION} docker-ce-cli=${DOCKER_CE_VERSION} containerd.io
+    #apt-get update -q && apt-get install -yq docker-ce=${DOCKER_CE_VERSION} docker-ce-cli=${DOCKER_CE_VERSION} containerd.io
+    apt-get update -q && apt-get install -yq docker-ce docker-ce-cli containerd.io
 
 # https://github.com/docker/docker/blob/master/project/PACKAGERS.md#runtime-dependencies
 RUN set -eux; \
     apt-get update -q && \
 	apt-get install -yq \
+        zsh \
 		btrfs-tools \
 		e2fsprogs \
 		iptables \
@@ -29,7 +31,6 @@ RUN set -eux; \
 		xz-utils \
 # pigz: https://github.com/moby/moby/pull/35697 (faster gzip implementation)
 		pigz \
-        zfs \
 		wget
 
 
