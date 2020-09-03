@@ -15,7 +15,7 @@ build:
     - apk add bash && rm -rf /var/cache/apk/*
     - mkdir -pm 700 ~/.ssh
     - eval $(ssh-agent -s)
-    - cat $SSH_PRIVATE_KEY | tr -d '\r' | ssh-add -
+    - cat "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
   script:
     - >
       bash build.sh
