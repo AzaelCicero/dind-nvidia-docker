@@ -1,8 +1,8 @@
-ARG CUDA_IMAGE=nvidia/cuda:10.2-runtime
+ARG CUDA_IMAGE=nvidia/cuda
 FROM ${CUDA_IMAGE}
 
-ARG DOCKER_CE_VERSION=5:18.09.1~3-0~ubuntu-xenial
-
+ENV TZ=Europe/Warsaw
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update -q && \
     apt-get install -yq \
@@ -16,7 +16,6 @@ RUN apt-get update -q && \
        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
        $(lsb_release -cs) \
        stable"  && \
-    #apt-get update -q && apt-get install -yq docker-ce=${DOCKER_CE_VERSION} docker-ce-cli=${DOCKER_CE_VERSION} containerd.io
     apt-get update -q && apt-get install -yq docker-ce docker-ce-cli containerd.io
 
 # https://github.com/docker/docker/blob/master/project/PACKAGERS.md#runtime-dependencies
@@ -24,7 +23,7 @@ RUN set -eux; \
     apt-get update -q && \
 	apt-get install -yq \
         zsh \
-		btrfs-tools \
+		btrfs-progs \
 		e2fsprogs \
 		iptables \
 		xfsprogs \
@@ -42,7 +41,7 @@ RUN set -x \
 	&& echo 'dockremap:165536:65536' >> /etc/subgid
 
 # https://github.com/docker/docker/tree/master/hack/dind
-ENV DIND_COMMIT 37498f009d8bf25fbb6199e8ccd34bed84f2874b
+ENV DIND_COMMIT ed89041433a031cafc0a0f19cfe573c31688d377
 
 RUN set -eux; \
 	wget -O /usr/local/bin/dind "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind"; \
@@ -63,7 +62,7 @@ RUN curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | \
 COPY dockerd-entrypoint.sh /usr/local/bin/
 
 VOLUME /var/lib/docker
-EXPOSE 2375
+EXPOSE 2375 2376
 
 ENTRYPOINT ["dockerd-entrypoint.sh"]
 CMD []
