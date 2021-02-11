@@ -1,4 +1,4 @@
-ARG CUDA_IMAGE=nvidia/cuda
+ARG CUDA_IMAGE=nvidia/cuda:11.2.0-devel
 FROM ${CUDA_IMAGE}
 
 ENV TZ=Europe/Warsaw
@@ -63,9 +63,10 @@ RUN curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | \
     rm -rf /var/lib/apt/lists/*
 
 COPY dockerd-entrypoint.sh /usr/local/bin/
+COPY entrypoint.sh /usr/local/bin/
 
 VOLUME /var/lib/docker
 EXPOSE 2375 2376
 
-ENTRYPOINT ["dockerd-entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD []

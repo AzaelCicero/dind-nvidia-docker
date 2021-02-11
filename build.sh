@@ -5,6 +5,7 @@ export BUILDKIT_PROGRESS=plain
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 IMAGE_NAME=nvidia-dind:latest
+BASE_IMAGE=nvidia/cuda:11.2.0-devel
 
 OPTIONS=""
 
@@ -23,6 +24,10 @@ while :; do
       IMAGE_NAME=$2
       shift
       ;;
+    --base-image)
+      BASE_IMAGE=$2
+      shift
+      ;;
     -h|--help)
       usage
       exit 0
@@ -33,11 +38,12 @@ while :; do
   shift
 done
 
-docker pull $IMAGE_NAME
+docker pull $BASE_IMAGE
 
 docker build \
     --ssh default \
     -t $IMAGE_NAME \
     -f $DIR/Dockerfile \
+    --build-arg CUDA_IMAGE=$BASE_IMAGE \
     $OPTIONS \
     $DIR
