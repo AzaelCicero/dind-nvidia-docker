@@ -33,6 +33,8 @@ while :; do
   shift
 done
 
+docker pull $IMAGE_NAME
+
 docker build \
     --ssh default \
     -t $IMAGE_NAME \
