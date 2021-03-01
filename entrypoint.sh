@@ -18,4 +18,4 @@ if [ -z "$@" ]; then
     set - "bash" -l
 fi
 
-bash -c "$@"
+exec "$@"
