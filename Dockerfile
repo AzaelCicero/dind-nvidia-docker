@@ -1,4 +1,4 @@
-ARG CUDA_IMAGE=nvidia/cuda
+ARG CUDA_IMAGE=nvidia/cuda:11.2.0-devel
 FROM ${CUDA_IMAGE}
 
 ENV TZ=Europe/Warsaw
@@ -16,7 +16,8 @@ RUN apt-get update -q && \
        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
        $(lsb_release -cs) \
        stable"  && \
-    apt-get update -q && apt-get install -yq docker-ce docker-ce-cli containerd.io
+    apt-get update -q && apt-get install -yq docker-ce docker-ce-cli containerd.io &&\
+    rm -rf /var/lib/apt/lists/*
 
 # https://github.com/docker/docker/blob/master/project/PACKAGERS.md#runtime-dependencies
 RUN set -eux; \
@@ -30,7 +31,8 @@ RUN set -eux; \
 		xz-utils \
 # pigz: https://github.com/moby/moby/pull/35697 (faster gzip implementation)
 		pigz \
-		wget
+		wget && \
+    rm -rf /var/lib/apt/lists/*
 
 
 # set up subuid/subgid so that "--userns-remap=default" works out-of-the-box
@@ -57,12 +59,14 @@ RUN curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | \
       tee /etc/apt/sources.list.d/nvidia-docker.list && \
     apt-get update -qq && \
     apt-get install -yq nvidia-docker2 && \
-    sed -i '2i \ \ \ \ "default-runtime": "nvidia",' /etc/docker/daemon.json
+    sed -i '2i \ \ \ \ "default-runtime": "nvidia",' /etc/docker/daemon.json &&\
+    rm -rf /var/lib/apt/lists/*
 
 COPY dockerd-entrypoint.sh /usr/local/bin/
+COPY entrypoint.sh /usr/local/bin/
 
 VOLUME /var/lib/docker
 EXPOSE 2375 2376
 
-ENTRYPOINT ["dockerd-entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD []
