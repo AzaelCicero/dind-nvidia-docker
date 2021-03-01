@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eu
 
+echo "Explicitly remove Containerd's default PID file to ensure that it can start properly if it was stopped uncleanly (and thus didn't clean up the PID file)"
+find /run /var/run -iname 'containerd*.pid' -delete || :
+
 echo "Launching dockerd..."
 dockerd-entrypoint.sh &
 
